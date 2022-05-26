@@ -1,20 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Printing.IndexedProperties;
 using System.Security.Cryptography;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PasswordGenerator
 {
@@ -64,8 +52,6 @@ namespace PasswordGenerator
             int digitCount;
             int punctuationCount;
 
-            Random rand = new Random();
-
             do
             {
                 buf = new byte[length];
@@ -75,7 +61,8 @@ namespace PasswordGenerator
                 digitCount = 0;
                 punctuationCount = 0;
 
-                (new RNGCryptoServiceProvider()).GetBytes(buf);
+                var generator = RandomNumberGenerator.Create();
+                generator.GetBytes(buf);
 
                 for (int iter = 0; iter < length; iter++)
                 {
@@ -112,11 +99,11 @@ namespace PasswordGenerator
                         do
                         {
                             var available = availablePositions.ToArray();
-                            k = available[rand.Next(0, available.Length)];
+                            k = available[RandomNumberGenerator.GetInt32(0, available.Length)];
                         }
                         while (!Char.IsLetterOrDigit(cBuf[k]));
 
-                        cBuf[k] = punctuations[rand.Next(0, punctuations.Length)];
+                        cBuf[k] = punctuations[RandomNumberGenerator.GetInt32(0, punctuations.Length)];
                         availablePositions.Remove(k);
                         punctuationCount++;
                     }
@@ -130,9 +117,9 @@ namespace PasswordGenerator
                      punctuationCount > maximumPunctuationCharacters) 
                     )
                 {
-                    int upperCharactersToAdd = (mustHaveUpper && upperCount == 0 || punctuationCount > maximumPunctuationCharacters) ? rand.Next(1, Math.Min(length, 3)) : 0;
-                    int lowerCharactersToAdd = (mustHaveLower && lowerCount == 0 || punctuationCount > maximumPunctuationCharacters) ? rand.Next(1, Math.Min(length, 3)) : 0;
-                    int digitCharactersToAdd = (mustHaveDigit && digitCount == 0 || punctuationCount > maximumPunctuationCharacters) ? rand.Next(1, Math.Min(length, 3)) : 0;
+                    int upperCharactersToAdd = (mustHaveUpper && upperCount == 0 || punctuationCount > maximumPunctuationCharacters) ? RandomNumberGenerator.GetInt32(1, Math.Min(length, 3)) : 0;
+                    int lowerCharactersToAdd = (mustHaveLower && lowerCount == 0 || punctuationCount > maximumPunctuationCharacters) ? RandomNumberGenerator.GetInt32(1, Math.Min(length, 3)) : 0;
+                    int digitCharactersToAdd = (mustHaveDigit && digitCount == 0 || punctuationCount > maximumPunctuationCharacters) ? RandomNumberGenerator.GetInt32(1, Math.Min(length, 3)) : 0;
                     if (upperCharactersToAdd + lowerCharactersToAdd + digitCharactersToAdd > availablePositions.Count)
                     {
                         upperCharactersToAdd = (mustHaveUpper && upperCount == 0 || punctuationCount > maximumPunctuationCharacters) ? 1 : 0;
@@ -144,10 +131,10 @@ namespace PasswordGenerator
                     for (int j = 0; j < upperCharactersToAdd && availablePositions.Any(); j++)
                     {
                         var available = availablePositions.ToArray();
-                        k = available[rand.Next(0, available.Length)];
+                        k = available[RandomNumberGenerator.GetInt32(0, available.Length)];
 
                         var originalChar = cBuf[k];
-                        cBuf[k] = (char)('A' + rand.Next(0, 26));
+                        cBuf[k] = (char)('A' + RandomNumberGenerator.GetInt32(0, 26));
                         availablePositions.Remove(k);
                         upperCount++;
                         if (!Char.IsLetterOrDigit(originalChar))
@@ -159,10 +146,10 @@ namespace PasswordGenerator
                     for (int j = 0; j < lowerCharactersToAdd && availablePositions.Any(); j++)
                     {
                         var available = availablePositions.ToArray();
-                        k = available[rand.Next(0, available.Length)];
+                        k = available[RandomNumberGenerator.GetInt32(0, available.Length)];
 
                         var originalChar = cBuf[k];
-                        cBuf[k] = (char)('a' + rand.Next(0, 26));
+                        cBuf[k] = (char)('a' + RandomNumberGenerator.GetInt32(0, 26));
                         availablePositions.Remove(k);
                         lowerCount++;
                         if (!Char.IsLetterOrDigit(originalChar))
@@ -174,10 +161,10 @@ namespace PasswordGenerator
                     for (int j = 0; j < digitCharactersToAdd && availablePositions.Any(); j++)
                     {
                         var available = availablePositions.ToArray();
-                        k = available[rand.Next(0, available.Length)];
+                        k = available[RandomNumberGenerator.GetInt32(0, available.Length)];
 
                         var originalChar = cBuf[k];
-                        cBuf[k] = (char)('0' + rand.Next(0, 10));
+                        cBuf[k] = (char)('0' + RandomNumberGenerator.GetInt32(0, 10));
                         availablePositions.Remove(k);
                         digitCount++;
                         if (!Char.IsLetterOrDigit(originalChar))
